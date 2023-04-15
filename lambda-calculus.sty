@@ -1,0 +1,87 @@
+\RequirePackage{amsmath}
+\RequirePackage{mathtools}
+\RequirePackage{xparse}
+
+\DeclarePairedDelimiter{\termset}{\langle}{\rangle}
+
+\newif\ifapp%
+\newif\ifabs%
+\newif\iftyped%
+
+
+\newcommand{\@lambda@abs}[2]{{\abstrue\lambda#1.#2}}
+
+\NewDocumentCommand{\abs}{s m m}{%
+	\IfBooleanTF{#1}{%
+		\ifabs(\fi
+		\@lambda@abs{#2}{#3}%
+		\ifabs)\absfalse\fi
+	}{%
+		\@lambda@abs{#2}{#3}
+	}
+}
+
+\NewDocumentCommand{\app}{s m m}{
+	{\apptrue%
+			\IfBooleanTF{#1}{\left(#2#3\right)}{#2#3}
+			\appfalse}
+}
+
+
+\newcommand{\K}{%
+	{\mathbf{K}}
+}
+\newcommand{\I}{%
+	{\mathbf{I}}
+}
+\renewcommand{\S}{%
+	{\mathbf{S}}
+}
+
+
+\newcommand{\typed}[2]{#1\!:\!#2}
+
+\newcommand{\grammar}[2]{\[\let\and\mid#1 \Coloneq #2\]}
+
+\newcommand{\Kripke}{\(\termset{C,\leq,\Vdash}\)}
+
+
+
+\newcommand{\lI}{\abs xx} %chktex 1
+\newcommand{\lK}{\abs{xy}x}
+\newcommand{\lS}{\abs{xyz}{\app{xz}\app*{yz}}}
+
+
+\newcommand{\s}{\sigma}
+\newcommand{\f}{\varphi}
+\newcommand{\y}{\psi}
+\renewcommand{\t}{\tau}
+\renewcommand{\r}{\rho}
+
+\DeclareOption{combinatory}{
+	\NewDocumentCommand{\absC}{s m m}{%
+		\IfBooleanTF{#1}{%
+			\ifabs(\fi
+      \@lambda@abs{#2}{#3}%
+			\ifabs)\absfalse\fi
+		}{%
+			\@lambda@abs{#2}{#3}
+		}
+	}
+
+  \renewcommand{\K}{%
+    \@ifstar{\mathsf{K}}{\mathbf{K}}
+  }
+  \renewcommand{\I}{%
+    \@ifstar{\mathsf{I}}{\mathbf{I}}
+  }
+  \renewcommand{\S}{%
+    \@ifstar{\mathsf{S}}{\mathbf{S}}
+  }
+
+
+  \newcommand{\combtran}[1]{\ensuremath{{\left(#1\right)}_{\mathscr{C}}}}
+  \newcommand{\lambtran}[1]{\ensuremath{{\left(#1\right)}_{\Lambda}}}
+}
+
+\ProcessOptions%
