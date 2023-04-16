@@ -2,20 +2,30 @@
 \RequirePackage{mathtools}
 \RequirePackage{xparse}
 
-\DeclarePairedDelimiter{\termset}{\langle}{\rangle}
 
 \newif\ifapp%
 \newif\ifabs%
 \newif\iftyped%
 
+\newlength{\abs@sepspace}
+\setlength{\abs@sepspace}{0pt}
 
-\newcommand{\@lambda@abs}[2]{{\abstrue\lambda#1.#2}}
+\newcommand{\SetAbsSepSpacing}[1]{\setlength{\abs@sepspace}{#1}}
+\newcommand{\DeclareAbsSeparator}[1]{\def\abs@separator{\abs@sepspace#1\abs@sepspace}}
+\newcommand{\DeclareAppDelimiter}[2]{\DeclarePairedDelimiter{\app@delimiter}{1}{#2}} %chktex 9 
+\newcommand{\DeclareAbsDelimiter}[2]{\DeclarePairedDelimiter{\abs@delimiter}{1}{#2}} %chktex 9 
+
+\newcommand{\@lambda@abs}[2]{{\abstrue\lambda#1\abs@separator#2}}
+
+\DeclareTermSetDelimiter{\langle}{\rangle}
+\DeclareAppDelimiter{\langle}{\rangle}
+\DeclareAbsDelimiter{\langle}{\rangle}
+\DeclareAbsSeparator{.}
 
 \NewDocumentCommand{\abs}{s m m}{%
 	\IfBooleanTF{#1}{%
-		\ifabs(\fi
-		\@lambda@abs{#2}{#3}%
-		\ifabs)\absfalse\fi
+    \ifabs\abs@delimiter{\@lambda@abs{#2}{#3}}
+		\absfalse\fi
 	}{%
 		\@lambda@abs{#2}{#3}
 	}
@@ -23,7 +33,7 @@
 
 \NewDocumentCommand{\app}{s m m}{
 	{\apptrue%
-			\IfBooleanTF{#1}{\left(#2#3\right)}{#2#3}
+      \IfBooleanTF{#1}{\app@delimiter{#2#3}}{#2#3}
 			\appfalse}
 }
 
@@ -39,12 +49,45 @@
 }
 
 
-\newcommand{\typed}[2]{#1\!:\!#2}
+\newlength{\type@sepspace}
+\setlength{\type@sepspace}{.2em}
 
-\newcommand{\grammar}[2]{\[\let\and\mid#1 \Coloneq #2\]}
+\newcommand{\SetTypeSepSpacing}[1]{\setlength\type@sepspace#1}
+\newcommand{\DeclareTypeSeparator}[1]{\def\type@separator{\type@sepspace#1\type@sepspace}}
+\DeclareTypeSeparator{:}
 
-\newcommand{\Kripke}{\(\termset{C,\leq,\Vdash}\)}
+\newcommand{\typed}[2]{#1\type@separator#2}
 
+
+\newcommand{\DeclareTermSetDelimiter}[2]{\DeclarePairedDelimiter{\termset}{#1}{#2}}
+\newcommand{\grammar}[2]{{\[\let\and\mid#1 \Coloneq #2\]}}
+\newcommand{\longgrammar}[2]{%
+	{%
+    \[\def\and{\\ \mid & }
+      \begin{aligned}
+        #1 \Coloneq & #2
+      \end{aligned}
+    \]
+  }
+}
+
+
+\newcommand{\DeclareProofInfixSymb}{\def\admits@proof}
+\DeclareProofInfixSymb{\Vdash}
+
+\newcommand{\DeclareKripkeName}{\kripke@hame}
+\newcommand{\DeclareKripkeKnowledgeSymb}{\def\kripke@knowledge}
+\newcommand{\DeclareKripkeRelationSymb}{\def\kripke@relation}
+\newcommand{\DeclareKripkeProvableSymb}{\def\kripke@provable}
+
+\DeclareKripkeName{\mathscr{C}}
+\DeclareKripkeKnowledgeSym{C}
+\DeclareKripkeRelationSymb{\leq}
+\DeclareKripkeProvableSymb{\admits@proof}
+
+\newcommand{\Kripke}{\kripke@name}
+\newcommand{\KripkeSet}{\(\termset{\kripke@knowledge,\kripke@relation,\kripke@provable}\)}
+\newcommand{\printKripkeDef}{\Kripke = \KripkeSet} % chktex 1
 
 
 \newcommand{\lI}{\abs xx} %chktex 1
@@ -58,30 +101,49 @@
 \renewcommand{\t}{\tau}
 \renewcommand{\r}{\rho}
 
+
+
+\newcommand{\DeclareTermReductionSymb}{\def\reduces@to}
+\DeclareTermReductionSymb{\rightarrow}
+
+\newcommand{\Redux}{\reduces@to}
+\newcommand{\aRedux}{\reduces@to_\alpha}
+\newcommand{\bRedux}{\reduces@to_\beta}
+\newcommand{\eRedux}{\reduces@to_\eta}
+
+
+\newcommand{\DeclareLambdaEquivSymb}[1]{\def\lambda@equiv{\ensuremath{#1}}}
+\DeclareLambdaEquivSymb{=}
+
+\newcommand{\aEquiv}{\lambda@equiv_\alpha}
+\newcommand{\bEquiv}{\lambda@equiv\beta}
+\newcommand{\eEquiv}{\lambda@equiv\eta}
+
+
 \DeclareOption{combinatory}{
 	\NewDocumentCommand{\absC}{s m m}{%
 		\IfBooleanTF{#1}{%
-			\ifabs(\fi
-      \@lambda@abs{#2}{#3}%
-			\ifabs)\absfalse\fi
+    \ifabs\fi
+    \@lambda@abs{#2}{#3}%
+    \ifabs\absfalse\fi
 		}{%
 			\@lambda@abs{#2}{#3}
 		}
 	}
 
-  \renewcommand{\K}{%
-    \@ifstar{\mathsf{K}}{\mathbf{K}}
-  }
-  \renewcommand{\I}{%
-    \@ifstar{\mathsf{I}}{\mathbf{I}}
-  }
-  \renewcommand{\S}{%
-    \@ifstar{\mathsf{S}}{\mathbf{S}}
-  }
+	\renewcommand{\K}{%
+		\@ifstar{\mathsf{K}}{\mathbf{K}}
+	}
+	\renewcommand{\I}{%
+		\@ifstar{\mathsf{I}}{\mathbf{I}}
+	}
+	\renewcommand{\S}{%
+		\@ifstar{\mathsf{S}}{\mathbf{S}}
+	}
 
 
-  \newcommand{\combtran}[1]{\ensuremath{{\left(#1\right)}_{\mathscr{C}}}}
-  \newcommand{\lambtran}[1]{\ensuremath{{\left(#1\right)}_{\Lambda}}}
+	\newcommand{\combtran}[1]{\ensuremath{{\left(#1\right)}_{\mathscr{C}}}}
+	\newcommand{\lambtran}[1]{\ensuremath{{\left(#1\right)}_{\Lambda}}}
 }
 
 \ProcessOptions%
