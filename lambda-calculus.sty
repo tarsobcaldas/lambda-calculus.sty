@@ -49,14 +49,6 @@
 }
 
 
-\newlength{\type@sepspace}
-\setlength{\type@sepspace}{.2em}
-
-\newcommand{\SetTypeSepSpacing}[1]{\setlength\type@sepspace#1}
-\newcommand{\DeclareTypeSeparator}[1]{\def\type@separator{\type@sepspace#1\type@sepspace}}
-\DeclareTypeSeparator{:}
-
-\newcommand{\typed}[2]{#1\type@separator#2}
 
 
 \newcommand{\DeclareTermSetDelimiter}[2]{\DeclarePairedDelimiter{\termset}{#1}{#2}}
@@ -71,9 +63,23 @@
   }
 }
 
+\newcommand{\DeclareEnvironmentSymb}{\def\enf@set}
+\newcommand{\envset}{\env@set}
+\DeclareEnvironmentSymb{\Gamma}
+
+\newlength{\type@sepspace}
+\setlength{\type@sepspace}{.2em}
+
+\newcommand{\SetTypeSepSpacing}[1]{\setlength\type@sepspace#1}
+\newcommand{\DeclareTypeSeparator}[1]{\def\type@separator{\type@sepspace#1\type@sepspace}}
+\DeclareTypeSeparator{:}
+
+\newcommand{\typed}[2]{#1\type@separator#2}
 
 \newcommand{\DeclareProofInfixSymb}{\def\admits@proof}
+\newcommand{\DeclareDerivableInfixSymb}{\def\derives@jugement}
 \DeclareProofInfixSymb{\Vdash}
+\DeclareDerivableInfixSymb{\admits@proof}
 
 \newcommand{\DeclareKripkeName}{\kripke@hame}
 \newcommand{\DeclareKripkeKnowledgeSymb}{\def\kripke@knowledge}
