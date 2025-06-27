@@ -3,10 +3,18 @@
 \RequirePackage{xparse}
 
 
+% \begin{macrocode}
 \newif\ifapp%
 \newif\ifabs%
 \newif\iftyped%
+% \end{macrocode}
 
+\newcommand{\DeclareFixpointSymb}{\def\@fixpointsymb}
+\newcommand{\fixpointsymb}{\@fixpointsymb}
+\DeclareMathOperator{\fixpoint}{\fixpointsymb}
+\DeclareFixpointSymb{\mathit{Y}}
+
+% \begin{macrocode}
 \newlength{\abs@sepspace}
 \setlength{\abs@sepspace}{0pt}
 
@@ -15,135 +23,213 @@
 \newcommand{\DeclareAppDelimiter}[2]{\DeclarePairedDelimiter{\app@delimiter}{1}{#2}} %chktex 9 
 \newcommand{\DeclareAbsDelimiter}[2]{\DeclarePairedDelimiter{\abs@delimiter}{1}{#2}} %chktex 9 
 
-\newcommand{\@lambda@abs}[2]{{\abstrue\lambda#1\abs@separator#2}}
 
-\DeclareTermSetDelimiter{\langle}{\rangle}
-\DeclareAppDelimiter{\langle}{\rangle}
 \DeclareAbsDelimiter{\langle}{\rangle}
 \DeclareAbsSeparator{.}
 
+\newcommand{\@lambda@abs}[2]{{\abstrue\lambda#1\abs@separator#2}}
+
 \NewDocumentCommand{\abs}{s m m}{%
 	\IfBooleanTF{#1}{%
-    \ifabs\abs@delimiter{\@lambda@abs{#2}{#3}}
-		\absfalse\fi
+		\ifabs%
+			\abs@delimiter{\@lambda@abs{#2}{#3}}
+			\absfalse%
+		\fi
 	}{%
 		\@lambda@abs{#2}{#3}
 	}
 }
+% \end{macrocode}
 
+% \begin{macrocode}
+\DeclareAppDelimiter{\langle}{\rangle}
 \NewDocumentCommand{\app}{s m m}{
 	{\apptrue%
-      \IfBooleanTF{#1}{\app@delimiter{#2#3}}{#2#3}
+			\IfBooleanTF{#1}{\app@delimiter{#2#3}}{#2#3}
 			\appfalse}
 }
+% \end{macrocode}
 
-
-\newcommand{\K}{%
+% \begin{macrocode}
+\newcommand{\Kcomb}{%
 	{\mathbf{K}}
 }
-\newcommand{\I}{%
+\newcommand{\Icomb}{%
 	{\mathbf{I}}
 }
-\renewcommand{\S}{%
+\newcommand{\Scomb}{%
 	{\mathbf{S}}
 }
 
+\newcommand{\Iexpr}{\abs xx} %chktex 1
+\newcommand{\Kexpr}{\abs{xy}x}
+\newcommand{\Sexpr}{\abs{xyz}{\app{xz}\app*{yz}}}
+% \end{macrocode}
 
 
-
+% \begin{macrocode}
 \newcommand{\DeclareTermSetDelimiter}[2]{\DeclarePairedDelimiter{\termset}{#1}{#2}}
-\newcommand{\grammar}[2]{{\[\let\and\mid#1 \Coloneq #2\]}}
-\newcommand{\longgrammar}[2]{%
-	{%
-    \[\def\and{\\ \mid & }
-      \begin{aligned}
-        #1 \Coloneq & #2
-      \end{aligned}
-    \]
-  }
+\DeclareTermSetDelimiter{\langle}{\rangle}
+\newcommand{\inlinegrammar}[2]{{%
+			\(\renewcommand{\and}{%
+				\hspace{2pt plus 1pt minus 1pt}\big|\hspace{2pt plus 1pt minus 1pt}%
+			}#1 \Coloneq #2\)%
+		}
 }
 
-\newcommand{\DeclareEnvironmentSymb}{\def\enf@set}
+\newcommand{\grammar}[2]{{%
+			\[
+				\renewcommand{\and}{\hspace{2.5pt plus 1pt minus .5pt}\big|\hspace{2.5pt plus 1pt minus .5pt}}#1 \Coloneq #2
+			\]
+		}
+}
+
+\newcommand{\longgrammar}[2]{%
+	{%
+			\[
+				\def\and{\\ \mid & }
+				\begin{aligned}
+					#1 ::= & #2
+				\end{aligned}
+			\]
+		}
+}
+% \end{macrocode}
+
+\newcommand{\DeclareTermSymbs}[2]{\def\term@star{#2}\def\term@nonstar{#1}}
+\DeclareTermSymbs{M}{N}
+\newcommand{\term}{\@ifstar{\term@star}{\term@nonstar}}
+
+\newcommand{\DeclareVarSymbs}[2]{\def\var@star{#2}\def\var@nonstar{#1}}
+\DeclareVarSymbs{x}{y}
+\providecommand{\term}{\@ifstar{\var@star}{\var@nonstar}}
+
+% \begin{macrocode}
+\newcommand{\DeclareEnvironmentSetSymb}{\def\env@set}
 \newcommand{\envset}{\env@set}
-\DeclareEnvironmentSymb{\Gamma}
+\DeclareEnvironmentSetSymb{\Gamma}
+% \end{macrocode}
 
+% \begin{macrocode}
+\newcommand{\DeclareEnvironmentSymb}{\def\env@symb}
+\newcommand{\env}[2]{\ensuremath{#1 \env@symb #2}}
+\DeclareEnvironmentSymb{\vdash}
+% \end{macrocode}
+
+% \begin{macrocode}
 \newlength{\type@sepspace}
-\setlength{\type@sepspace}{.2em}
+\setlength{\type@sepspace}{0em}
+\newcommand{\SetTypeSepSpacing}[1]{\setlength\type@sepspace #1}
+\newcommand{\DeclareTypeSeparator}[1]{\def\type@separator{#1}}
+\DeclareTypeSeparator{\colon}
 
-\newcommand{\SetTypeSepSpacing}[1]{\setlength\type@sepspace#1}
-\newcommand{\DeclareTypeSeparator}[1]{\def\type@separator{\type@sepspace#1\type@sepspace}}
-\DeclareTypeSeparator{:}
+\newcommand{\typed}[2]{\ensuremath{#1\type@separator#2}}
+% \end{macrocode}
 
-\newcommand{\typed}[2]{#1\type@separator#2}
-
-\newcommand{\DeclareProofInfixSymb}{\def\admits@proof}
-\newcommand{\DeclareDerivableInfixSymb}{\def\derives@jugement}
-\DeclareProofInfixSymb{\Vdash}
-\DeclareDerivableInfixSymb{\admits@proof}
-
-\newcommand{\DeclareKripkeName}{\kripke@hame}
-\newcommand{\DeclareKripkeKnowledgeSymb}{\def\kripke@knowledge}
-\newcommand{\DeclareKripkeRelationSymb}{\def\kripke@relation}
-\newcommand{\DeclareKripkeProvableSymb}{\def\kripke@provable}
-
-\DeclareKripkeName{\mathscr{C}}
-\DeclareKripkeKnowledgeSym{C}
-\DeclareKripkeRelationSymb{\leq}
-\DeclareKripkeProvableSymb{\admits@proof}
-
-\newcommand{\Kripke}{\kripke@name}
-\newcommand{\KripkeSet}{\(\termset{\kripke@knowledge,\kripke@relation,\kripke@provable}\)}
-\newcommand{\printKripkeDef}{\Kripke = \KripkeSet} % chktex 1
+% \begin{macrocode}
+\newcommand{\DeclareTypedSetSymb}{\def\typed@set}
+\newcommand{\typedset}{\typed@set}
+\DeclareTypedSetSymb{\Sigma}
+% \end{macrocode}
 
 
-\newcommand{\lI}{\abs xx} %chktex 1
-\newcommand{\lK}{\abs{xy}x}
-\newcommand{\lS}{\abs{xyz}{\app{xz}\app*{yz}}}
-
-
-\newcommand{\s}{\sigma}
-\newcommand{\f}{\varphi}
-\newcommand{\y}{\psi}
-\renewcommand{\t}{\tau}
-\renewcommand{\r}{\rho}
-
-
-
+% \begin{macrocode}
 \newcommand{\DeclareTermReductionSymb}{\def\reduces@to}
 \DeclareTermReductionSymb{\rightarrow}
 
-\newcommand{\Redux}{\reduces@to}
-\newcommand{\aRedux}{\reduces@to_\alpha}
-\newcommand{\bRedux}{\reduces@to_\beta}
-\newcommand{\eRedux}{\reduces@to_\eta}
+\newcommand{\Redux}[1][]{%
+	{%
+			\def\temp{#1}%
+			\if%
+				\temp=\empty%
+				\reduces@to%
+			\else
+				%
+				\reduces@to_#1%
+			\fi
+		}
+}
+% \end{macrocode}
 
+% \begin{macrocode}
+\newcommand{\DeclareSubstitutionSymb}{\def\subst@symb}
+\newcommand{\subst@by}[2]{\ensuremath{#1 \subst@symb #2}}
+\newcommand{\DeclareSubstitutionDelimiter}[2]{\DeclarePairedDelimiter{\@subst}{#1}{#2}}
+\newcommand{\substitution}[2]{\ensuremath{\let\by\subst@by #1\@subst{#2}}}
+\DeclareSubstitutionSymb{\slash}
+\DeclareSubstitutionDelimiter{\{}{\}}
+% \end{macrocode}
+
+% \begin{macrocode}
+\newcommand{\aRedux}{\reduces@to[\alpha]}
+\newcommand{\bRedux}{\reduces@to[\beta]}
+\newcommand{\eRedux}{\reduces@to[\eta]}
 
 \newcommand{\DeclareLambdaEquivSymb}[1]{\def\lambda@equiv{\ensuremath{#1}}}
 \DeclareLambdaEquivSymb{=}
 
-\newcommand{\aEquiv}{\lambda@equiv_\alpha}
-\newcommand{\bEquiv}{\lambda@equiv\beta}
-\newcommand{\eEquiv}{\lambda@equiv\eta}
+\newcommand{\Equiv}[1][]{%
+	{%
+			\def\temp{#1}%
+			\if%
+				\temp=\empty%
+				\lambda@equiv%
+			\else
+				%
+				\reduces@to_#1%
+			\fi
+		}
+}
+
+\newcommand{\aEquiv}{\lambda@equiv[\alpha]}
+\newcommand{\bEquiv}{\lambda@equiv[\beta]}
+\newcommand{\eEquiv}{\lambda@equiv[\eta]}
+% \end{macrocode}
+
+
+
+\newcommand{\Or}{\vee}
+
+
+\providecommand{\code}[1]{\text{\footnotesize\texttt{#1}}}
+\newcommand{\DeclareCondSymb}{\def\@condsymb}
+\DeclareCondSymb{\code{if}}
+\DeclareMathOperator{\condsymb}{\@condsymb}
+\newcommand{\cond}[3]{\ensuremath{\condsymb#1#2#3}}
+
+\newcommand{\DeclareBottomSymb}{\def\@bottomsymb}
+\DeclareBottomSymb{\bot}
+\DeclareMathOperator{\bottom}{\@bottomsymb}
+
+\DeclareOption{greek-alias}{
+	\newcommand{\s}{\sigma}
+	\newcommand{\f}{\varphi}
+	\newcommand{\y}{\psi}
+	\renewcommand{\t}{\tau}
+	\renewcommand{\r}{\rho}
+}
 
 
 \DeclareOption{combinatory}{
 	\NewDocumentCommand{\absC}{s m m}{%
 		\IfBooleanTF{#1}{%
-    \ifabs\fi
-    \@lambda@abs{#2}{#3}%
-    \ifabs\absfalse\fi
+			\ifabs\fi
+			\@lambda@abs{#2}{#3}%
+			\ifabs%
+				\absfalse%
+			\fi
 		}{%
 			\@lambda@abs{#2}{#3}
 		}
 	}
 
-	\renewcommand{\K}{%
+	\renewcommand{\Kcomb}{%
 		\@ifstar{\mathsf{K}}{\mathbf{K}}
 	}
-	\renewcommand{\I}{%
+	\renewcommand{\Icomb}{%
 		\@ifstar{\mathsf{I}}{\mathbf{I}}
 	}
-	\renewcommand{\S}{%
+	\renewcommand{\Scomb}{%
 		\@ifstar{\mathsf{S}}{\mathbf{S}}
 	}
 
