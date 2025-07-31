@@ -79,7 +79,7 @@
 
 \newcommand{\grammar}[2]{{%
 			\[
-				\renewcommand{\and}{\hspace{2.5pt plus 1pt minus .5pt}\big|\hspace{2.5pt plus 1pt minus .5pt}}#1 \Coloneq #2
+				\renewcommand{\and}{\hspace{4.5pt plus 1pt minus 2.5pt}\Big|\hspace{4.5pt plus 1pt minus 2.5pt}}#1 \Coloneq #2
 			\]
 		}
 }
@@ -87,9 +87,9 @@
 \newcommand{\longgrammar}[2]{%
 	{%
 			\[
-				\def\and{\\ \mid & }
+				\def\and{\\ & }
 				\begin{aligned}
-					#1 ::= & #2
+          #1 \Coloneq{} & #2
 				\end{aligned}
 			\]
 		}
@@ -155,7 +155,7 @@
 \newcommand{\DeclareSubstitutionSymb}{\def\subst@symb}
 \newcommand{\subst@by}[2]{\ensuremath{#1 \subst@symb #2}}
 \newcommand{\DeclareSubstitutionDelimiter}[2]{\DeclarePairedDelimiter{\@subst}{#1}{#2}}
-\newcommand{\substitution}[2]{\ensuremath{\let\by\subst@by #1\@subst{#2}}}
+\newcommand{\substitution}[2]{\ensuremath{\@subst{\subst@by{#1}{#2}}}}
 \DeclareSubstitutionSymb{\slash}
 \DeclareSubstitutionDelimiter{\{}{\}}
 % \end{macrocode}
